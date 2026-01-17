@@ -3,148 +3,275 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Roulette • Mini App</title>
+  <title>Rulet Masası • Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
-      --bg:#0b0f14; --card:#0f1620; --muted:#93a4b8; --text:#e8eef7;
-      --line:rgba(255,255,255,.08); --glow:rgba(120,180,255,.25);
-      --green:#16c784; --red:#ff4d4d; --black:#1f2937; --gold:#f7c948;
+      --bg:#0b0f14;
+      --panel:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.12);
+      --text:#e8eef7;
+      --muted:#95a3b8;
+      --green:#1fbf75;
+      --red:#c84545;
+      --black:#141a22;
+      --gold:#f0c94a;
+      --glow:rgba(240,201,74,.18);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% 0%, rgba(120,180,255,.12), transparent 55%),
-                      radial-gradient(900px 600px at 90% 30%, rgba(247,201,72,.10), transparent 60%),
-                      var(--bg);
-         color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 28px;}
-    .top{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px}
-    .brand{display:flex;flex-direction:column;gap:2px}
-    .brand .t{font-weight:700;letter-spacing:.6px}
-    .brand .s{color:var(--muted);font-size:13px}
-    .pill{padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
-    .grid2{display:grid;grid-template-columns: 1.35fr .65fr; gap:14px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-          border:1px solid var(--line); border-radius:18px; padding:14px;
-          box-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 18px 60px rgba(0,0,0,.45);}
-    .tableHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .tableHead .h{font-weight:650}
-    .tableHead .m{color:var(--muted);font-size:12px}
-    .rouletteGrid{display:grid;grid-template-columns: repeat(6, 1fr); gap:10px}
-    .num{padding:14px 0;border-radius:14px;border:1px solid var(--line);cursor:pointer;
-         background:rgba(255,255,255,.03); color:var(--text); font-weight:650;
-         transition: transform .08s ease, border-color .2s ease, box-shadow .2s ease;}
-    .num:hover{transform: translateY(-1px); border-color: rgba(120,180,255,.25); box-shadow: 0 0 0 4px rgba(120,180,255,.08);}
-    .num.green{background:rgba(22,199,132,.12); border-color: rgba(22,199,132,.25)}
-    .num.red{background:rgba(255,77,77,.12); border-color: rgba(255,77,77,.22)}
-    .num.black{background:rgba(31,41,55,.55); border-color: rgba(255,255,255,.10)}
-    .row{display:flex;gap:10px;margin-top:12px}
-    .btn{flex:1;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
-         background:rgba(255,255,255,.03); color:var(--text); cursor:pointer; font-weight:650;}
-    .btn.primary{background:linear-gradient(180deg, rgba(120,180,255,.18), rgba(120,180,255,.06));
-                border-color: rgba(120,180,255,.28); box-shadow: 0 0 0 4px rgba(120,180,255,.08);}
-    .btn.gold{background:linear-gradient(180deg, rgba(247,201,72,.22), rgba(247,201,72,.08));
-              border-color: rgba(247,201,72,.30); box-shadow: 0 0 0 4px rgba(247,201,72,.08);}
-    .slip{display:flex;flex-direction:column;gap:12px}
-    .slip .section{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(0,0,0,.18)}
-    .sectionTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .sectionTitle .h{font-weight:650}
-    .sectionTitle .s{color:var(--muted);font-size:12px}
-    .chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{padding:9px 10px;border-radius:999px;border:1px solid var(--line);
-          background:rgba(255,255,255,.03); color:var(--text); cursor:pointer; font-size:13px}
-    .chip.on{border-color: rgba(120,180,255,.35); box-shadow:0 0 0 4px rgba(120,180,255,.08)}
-    .chip.red{border-color: rgba(255,77,77,.35)}
-    .chip.black{border-color: rgba(255,255,255,.18)}
-    .chip.green{border-color: rgba(22,199,132,.35)}
-    .kv{display:grid;grid-template-columns:1fr auto; gap:8px; color:var(--muted); font-size:13px}
-    .kv b{color:var(--text)}
-    .big{font-size:44px;font-weight:800;letter-spacing:1px}
-    .sub{color:var(--muted);font-size:12px;margin-top:-6px}
-    .hr{height:1px;background:var(--line);margin:10px 0}
-    .warn{color:var(--muted);font-size:12px;line-height:1.35}
-    @media (max-width: 900px){ .grid2{grid-template-columns:1fr} }
+    body{
+      margin:0; color:var(--text);
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;
+      background: radial-gradient(1100px 600px at 20% 0%, rgba(120,180,255,.10), transparent 55%),
+                  radial-gradient(900px 600px at 90% 35%, rgba(240,201,74,.10), transparent 60%),
+                  var(--bg);
+      padding:16px;
+    }
+    .wrap{max-width:980px;margin:0 auto}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .title{font-weight:800;letter-spacing:.5px}
+    .sub{color:var(--muted);font-size:12px;margin-top:2px}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:8px 10px;color:var(--muted);font-size:12px}
+
+    .board{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: 0 20px 70px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .boardInner{padding:14px}
+
+    /* ====== TABLE LAYOUT ====== */
+    .table{
+      display:grid;
+      grid-template-columns: 64px 1fr 64px;
+      gap:10px;
+      align-items:stretch;
+    }
+    .zero{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(31,191,117,.18);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:18px;
+      cursor:pointer; user-select:none;
+      position:relative;
+    }
+
+    .numbers{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .numbersGrid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(3, 48px);
+    }
+    .cell{
+      border-right:1px solid rgba(255,255,255,.08);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; cursor:pointer; user-select:none;
+      transition: transform .06s ease, box-shadow .2s ease, outline-color .2s ease;
+      position:relative;
+    }
+    .cell:hover{transform: translateY(-1px)}
+    .cell.red{background: linear-gradient(180deg, rgba(200,69,69,.35), rgba(200,69,69,.18));}
+    .cell.black{background: linear-gradient(180deg, rgba(20,26,34,.85), rgba(20,26,34,.55));}
+    .cell.selected, .zero.selected{
+      outline: 2px solid rgba(240,201,74,.75);
+      box-shadow: 0 0 0 6px var(--glow);
+      z-index:2;
+    }
+
+    .rightSide{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .rightSide .rsRow{
+      height: calc(48px * 3 / 2);
+      display:flex; align-items:center; justify-content:center;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      font-weight:800;
+    }
+    .rightSide .rsRow:last-child{border-bottom:none}
+    .rsSmall{font-size:12px;color:var(--muted);font-weight:650}
+
+    /* ====== BETTING ROWS ====== */
+    .bets{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 64px 1fr;
+      gap:10px;
+    }
+    .bets .spacer{
+      height: 110px;
+    }
+    .betPanel{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .dozens{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .betBtn{
+      height:48px;
+      display:flex; align-items:center; justify-content:center;
+      border-right:1px solid rgba(255,255,255,.08);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      cursor:pointer; user-select:none;
+      font-weight:800;
+      background: rgba(255,255,255,.03);
+    }
+    .betBtn:last-child{border-right:none}
+    .betBtn:hover{filter:brightness(1.06)}
+    .betBtn.on{
+      outline:2px solid rgba(120,180,255,.55);
+      box-shadow:0 0 0 6px rgba(120,180,255,.10);
+      z-index:2;
+      position:relative;
+    }
+
+    .evens{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+    }
+    .betBtn.small{font-size:12px}
+    .betBtn.red{background: rgba(200,69,69,.20)}
+    .betBtn.black{background: rgba(20,26,34,.55)}
+
+    /* ====== FOOTER INFO ====== */
+    .footer{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .card{
+      flex:1 1 300px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background: rgba(0,0,0,.18);
+      padding:12px;
+    }
+    .krow{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:6px}
+    .krow b{color:var(--text)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .chip{
+      padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      font-weight:750;font-size:13px;
+    }
+    .muted{color:var(--muted);font-size:12px;line-height:1.35}
+    .btnRow{display:flex;gap:10px;margin-top:10px}
+    .action{
+      flex:1; padding:12px 12px; border-radius:12px;
+      border:1px solid var(--line); background: rgba(255,255,255,.03);
+      color:var(--text); font-weight:800; cursor:pointer;
+    }
+    .action.gold{border-color: rgba(240,201,74,.35); box-shadow:0 0 0 5px rgba(240,201,74,.08)}
+    .action.blue{border-color: rgba(120,180,255,.35); box-shadow:0 0 0 5px rgba(120,180,255,.08)}
+
+    @media (max-width: 860px){
+      .table{grid-template-columns: 56px 1fr 56px}
+      .numbersGrid{grid-template-rows: repeat(3, 44px)}
+      .rightSide .rsRow{height: calc(44px * 3 / 2)}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top">
-      <div class="brand">
-        <div class="t">EURO ROULETTE</div>
-        <div class="s">Mini App • Live stats (demo)</div>
+      <div>
+        <div class="title">AVRUPA RULETİ • MASA</div>
+        <div class="sub">Çıkan sayıyı tıkla → “Sonucu Kaydet”. (Demo/istatistik)</div>
       </div>
       <div class="pill" id="userpill">Telegram</div>
     </div>
 
-    <div class="grid2">
-      <div class="card">
-        <div class="tableHead">
-          <div>
-            <div class="h">Table</div>
-            <div class="m">Çıkan sayıyı tıkla (MARK) ya da DEMO SPIN kullan.</div>
+    <div class="board">
+      <div class="boardInner">
+
+        <div class="table">
+          <div class="zero" id="zeroBtn">0</div>
+
+          <div class="numbers">
+            <div class="numbersGrid" id="numbersGrid"></div>
           </div>
-          <div style="text-align:right">
-            <div class="big" id="last">—</div>
-            <div class="sub" id="lastmeta">last result</div>
+
+          <div class="rightSide">
+            <div class="rsRow"><span class="rsSmall">2’ye 1</span></div>
+            <div class="rsRow"><span class="rsSmall">2’ye 1</span></div>
+            <div class="rsRow"><span class="rsSmall">2’ye 1</span></div>
           </div>
         </div>
 
-        <div class="rouletteGrid" id="grid"></div>
-
-        <div class="row">
-          <button class="btn" id="undo">Undo</button>
-          <button class="btn primary" id="mark">MARK RESULT</button>
-          <button class="btn gold" id="spin">DEMO SPIN</button>
-        </div>
-
-        <div class="hr"></div>
-        <div class="kv">
-          <div>History (last 20)</div><b id="hcount">0</b>
-          <div>Mode</div><b id="mode">Manual</b>
-          <div>Note</div><b>İstatistik/öneri; garanti değil</b>
-        </div>
-      </div>
-
-      <div class="card slip">
-        <div class="section">
-          <div class="sectionTitle">
-            <div class="h">Bet Slip (DEMO)</div>
-            <div class="s">parayla bağlantısız</div>
-          </div>
-
-          <div class="chips" id="betChips">
-            <div class="chip red" data-bet="RED">Red</div>
-            <div class="chip black" data-bet="BLACK">Black</div>
-            <div class="chip" data-bet="ODD">Odd</div>
-            <div class="chip" data-bet="EVEN">Even</div>
-            <div class="chip" data-bet="1-12">1st 12</div>
-            <div class="chip" data-bet="13-24">2nd 12</div>
-            <div class="chip" data-bet="25-36">3rd 12</div>
-          </div>
-
-          <div class="hr"></div>
-          <div class="kv">
-            <div>Demo Bankroll</div><b id="bank">1000</b>
-            <div>Stake</div><b id="stake">50</b>
-            <div>Selected</div><b id="selected">—</b>
-          </div>
-          <div class="warn" style="margin-top:10px">
-            Bu slip sadece UI hissi içindir. Gerçek bahis / ödeme / yönlendirme yok.
+        <div class="bets">
+          <div class="spacer"></div>
+          <div class="betPanel">
+            <div class="dozens">
+              <div class="betBtn" data-bet="1-12">1.12</div>
+              <div class="betBtn" data-bet="13-24">2.12</div>
+              <div class="betBtn" data-bet="25-36">3.12</div>
+            </div>
+            <div class="evens">
+              <div class="betBtn small" data-bet="1-18">1-18</div>
+              <div class="betBtn small" data-bet="CIFT">ÇİFT</div>
+              <div class="betBtn small red" data-bet="KIRMIZI">KIRMIZI</div>
+              <div class="betBtn small black" data-bet="SIYAH">SİYAH</div>
+              <div class="betBtn small" data-bet="TEK">TEK</div>
+              <div class="betBtn small" data-bet="19-36">19-36</div>
+            </div>
           </div>
         </div>
 
-        <div class="section">
-          <div class="sectionTitle">
-            <div class="h">Insights</div>
-            <div class="s">last 50</div>
+        <div class="footer">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;">
+              <div>
+                <div style="font-weight:850">Son Sonuç</div>
+                <div class="muted">Manuel kayıt / demo</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:42px;font-weight:900" id="last">—</div>
+                <div class="muted" id="lastMeta">—</div>
+              </div>
+            </div>
+
+            <div class="btnRow">
+              <button class="action" id="undo">Geri Al</button>
+              <button class="action blue" id="save">Sonucu Kaydet</button>
+              <button class="action gold" id="demo">Demo Çevir</button>
+            </div>
+
+            <div class="krow"><span>Geçmiş (son 20)</span><b id="hcount">0</b></div>
+            <div class="chips" id="historyChips"></div>
+
+            <div class="muted" style="margin-top:10px">
+              Not: Rulet sonuçları bağımsız rastgele olaylardır. Bu ekran yalnızca istatistik/öneri amaçlıdır.
+            </div>
           </div>
-          <div class="kv" id="ins"></div>
-          <div class="hr"></div>
-          <div class="sectionTitle">
-            <div class="h">Recommended (stat)</div>
-            <div class="s">top 8</div>
+
+          <div class="card">
+            <div style="font-weight:850">Seçimler</div>
+            <div class="krow"><span>Seçili Sayı</span><b id="picked">—</b></div>
+            <div class="krow"><span>Seçili Kupon</span><b id="pickedBet">—</b></div>
+            <div class="krow"><span>Mod</span><b id="mode">Manuel</b></div>
+
+            <div class="muted" style="margin-top:10px">
+              İstersen bir sonraki adımda: “Sıcak/Soğuk”, “En uzun süredir gelmeyen”, “Komşular” gibi analizleri de ekleriz.
+            </div>
           </div>
-          <div class="chips" id="recs"></div>
         </div>
+
       </div>
     </div>
   </div>
@@ -153,212 +280,182 @@
   const tg = window.Telegram?.WebApp;
   if (tg) tg.expand();
 
-  const WHEEL_EU = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-
-  // Basit renk şeması (rulet masa hissi)
-  const REDS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-  function colorOf(n){
-    if (n===0) return "green";
-    return REDS.has(n) ? "red" : "black";
+  // Kullanıcı etiketi
+  const userpill = document.getElementById("userpill");
+  if (tg?.initDataUnsafe?.user) {
+    const u = tg.initDataUnsafe.user;
+    userpill.textContent = u.username ? "@"+u.username : (u.first_name || "Telegram");
   }
 
+  // Rulet renkleri (EU standard)
+  const REDS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+  function colorOf(n){
+    if (n === 0) return "green";
+    return REDS.has(n) ? "red" : "black";
+  }
+  function trColor(c){
+    if (c==="red") return "kırmızı";
+    if (c==="black") return "siyah";
+    if (c==="green") return "yeşil";
+    return c;
+  }
+
+  // History (localStorage)
   let history = JSON.parse(localStorage.getItem("history") || "[]");
   const MAX_STORE = 200;
 
-  let pendingMark = null; // MARK RESULT için seçilen sayı
-  let mode = "Manual";
-  let bankroll = 1000;
-  let stake = 50;
+  // UI state
+  let pendingNumber = null;
   let selectedBet = null;
+  let mode = "Manuel";
 
-  const gridEl = document.getElementById("grid");
+  const numbersGrid = document.getElementById("numbersGrid");
+  const zeroBtn = document.getElementById("zeroBtn");
+
   const lastEl = document.getElementById("last");
-  const lastMeta = document.getElementById("lastmeta");
-  const recsEl = document.getElementById("recs");
-  const insEl = document.getElementById("ins");
-  const hcountEl = document.getElementById("hcount");
+  const lastMetaEl = document.getElementById("lastMeta");
+  const pickedEl = document.getElementById("picked");
+  const pickedBetEl = document.getElementById("pickedBet");
   const modeEl = document.getElementById("mode");
-  const bankEl = document.getElementById("bank");
-  const stakeEl = document.getElementById("stake");
-  const selectedEl = document.getElementById("selected");
-  const userpill = document.getElementById("userpill");
+  const hcountEl = document.getElementById("hcount");
+  const historyChips = document.getElementById("historyChips");
 
-  if (tg?.initDataUnsafe?.user) {
-    userpill.textContent = tg.initDataUnsafe.user.username ? "@"+tg.initDataUnsafe.user.username : (tg.initDataUnsafe.user.first_name || "Telegram");
+  function saveStorage(){
+    localStorage.setItem("history", JSON.stringify(history.slice(-MAX_STORE)));
   }
 
-  function save(){ localStorage.setItem("history", JSON.stringify(history.slice(-MAX_STORE))); }
+  // 1..36 masa dizilimi (3 satır)
+  // Üst satır: 3,6,...,36
+  // Orta: 2,5,...,35
+  // Alt: 1,4,...,34
+  function buildTable(){
+    numbersGrid.innerHTML = "";
 
-  function freqMap(history, windowSize=50){
-    const slice = history.slice(-windowSize);
-    const m = new Map(); for (let i=0;i<=36;i++) m.set(i,0);
-    for (const n of slice) m.set(n,(m.get(n)||0)+1);
-    return m;
-  }
-  function recencyMap(history){
-    const m=new Map(); for (let i=0;i<=36;i++) m.set(i,Infinity);
-    for (let idx=history.length-1; idx>=0; idx--){
-      const n=history[idx];
-      if (m.get(n)===Infinity) m.set(n, history.length-1-idx);
-    }
-    return m;
-  }
-  function wheelNeighbors(n,k=2){
-    const i=WHEEL_EU.indexOf(n); if (i<0) return [];
-    const res=[];
-    for (let d=1; d<=k; d++){
-      res.push(WHEEL_EU[(i+d)%WHEEL_EU.length]);
-      res.push(WHEEL_EU[(i-d+WHEEL_EU.length)%WHEEL_EU.length]);
-    }
-    return [...new Set(res)];
-  }
-  function recommendNumbers(history,{windowSize=50,topK=8,wCold=1.0,wRecency=1.2,wNeighbors=0.8}={}){
-    if (!history.length) return [];
-    const freq=freqMap(history,windowSize);
-    const rec=recencyMap(history);
-    const last=history[history.length-1];
-    const neigh=new Set(wheelNeighbors(last,2));
+    const rows = [
+      Array.from({length:12}, (_,i)=> (i+1)*3),       // 3..36
+      Array.from({length:12}, (_,i)=> (i+1)*3 - 1),   // 2..35
+      Array.from({length:12}, (_,i)=> (i+1)*3 - 2),   // 1..34
+    ];
 
-    let maxF=0; for (const v of freq.values()) maxF=Math.max(maxF,v);
-    let maxR=0; for (const v of rec.values()){
-      const vv=(v===Infinity)?history.length:v; maxR=Math.max(maxR,vv);
+    // CSS grid row order: row1 top, row2 middle, row3 bottom
+    for (let r=0; r<3; r++){
+      for (let c=0; c<12; c++){
+        const n = rows[r][c];
+        const div = document.createElement("div");
+        div.className = "cell " + colorOf(n);
+        div.textContent = n;
+
+        div.addEventListener("click", ()=>{
+          pickNumber(n);
+          highlightSelected(n);
+        });
+
+        numbersGrid.appendChild(div);
+      }
     }
 
-    const scored=[];
-    for (let n=0;n<=36;n++){
-      const f=freq.get(n)||0;
-      const rRaw=rec.get(n);
-      const r=(rRaw===Infinity)?history.length:rRaw;
-
-      const cold=(maxF===0)?0:(maxF-f)/maxF;
-      const recency=(maxR===0)?0:r/maxR;
-      const neighbor=neigh.has(n)?1:0;
-
-      const score=wCold*cold+wRecency*recency+wNeighbors*neighbor;
-      scored.push({n,score,f,r,neighbor});
-    }
-    scored.sort((a,b)=>b.score-a.score);
-    return scored.slice(0,topK);
+    zeroBtn.addEventListener("click", ()=>{
+      pickNumber(0);
+      highlightZero();
+    });
   }
 
-  function insights(history){
-    const win=history.slice(-50);
-    if (!win.length) return {hot:[], cold:[], longest:[]};
-    const fm=freqMap(history,50);
-    const rm=recencyMap(history);
+  function clearHighlights(){
+    document.querySelectorAll(".cell").forEach(el=>el.classList.remove("selected"));
+    zeroBtn.classList.remove("selected");
+  }
+  function highlightSelected(n){
+    clearHighlights();
+    // cell text match (basit)
+    const cells = [...document.querySelectorAll(".cell")];
+    const target = cells.find(x => x.textContent === String(n));
+    if (target) target.classList.add("selected");
+  }
+  function highlightZero(){
+    clearHighlights();
+    zeroBtn.classList.add("selected");
+  }
 
-    const arr=[...fm.entries()].map(([n,f])=>({n,f})).sort((a,b)=>b.f-a.f);
-    const hot=arr.slice(0,5);
-    const cold=arr.slice(-5).reverse();
-
-    const recArr=[...rm.entries()].map(([n,r])=>({n, r:(r===Infinity)?history.length:r})).sort((a,b)=>b.r-a.r);
-    const longest=recArr.slice(0,5);
-
-    return {hot,cold,longest};
+  function pickNumber(n){
+    pendingNumber = n;
+    pickedEl.textContent = String(n);
   }
 
   function render(){
     const last = history.length ? history[history.length-1] : null;
-    lastEl.textContent = (last===null) ? "—" : String(last);
-    lastMeta.textContent = (last===null) ? "last result" : `last: ${colorOf(last)} • history: ${history.length}`;
-    hcountEl.textContent = String(Math.min(20, history.length));
+    lastEl.textContent = (last === null) ? "—" : String(last);
+    lastMetaEl.textContent = (last === null) ? "—" : `son: ${trColor(colorOf(last))} • toplam: ${history.length}`;
+
     modeEl.textContent = mode;
+    pickedBetEl.textContent = selectedBet || "—";
 
-    bankEl.textContent = bankroll;
-    stakeEl.textContent = stake;
-    selectedEl.textContent = selectedBet || "—";
+    // history chips
+    historyChips.innerHTML = "";
+    const tail = history.slice(-20);
+    hcountEl.textContent = String(tail.length);
 
-    // insights
-    const ins = insights(history);
-    insEl.innerHTML = `
-      <div>Hot</div><b>${ins.hot.map(x=>x.n).join(", ") || "—"}</b>
-      <div>Cold</div><b>${ins.cold.map(x=>x.n).join(", ") || "—"}</b>
-      <div>Longest missing</div><b>${ins.longest.map(x=>x.n).join(", ") || "—"}</b>
-    `;
-
-    // recs
-    recsEl.innerHTML = "";
-    const recs = recommendNumbers(history,{topK:8});
-    for (const x of recs){
-      const d=document.createElement("div");
-      d.className="chip "+(colorOf(x.n));
-      d.textContent = `${x.n}`;
-      d.title = `f:${x.f} r:${x.r}${x.neighbor?", neighbor":""}`;
-      recsEl.appendChild(d);
+    for (const n of tail){
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = n;
+      historyChips.appendChild(chip);
     }
 
-    save();
+    saveStorage();
 
-    // Telegram MainButton: history yolla (opsiyonel)
+    // Telegram MainButton opsiyonel: geçmişi bota yolla
     if (tg){
-      tg.MainButton.setText("Send history to bot");
+      tg.MainButton.setText("Geçmişi Bota Gönder");
       tg.MainButton.show();
       tg.MainButton.onClick(()=>{
-        tg.sendData(JSON.stringify({type:"history", history: history.slice(-100)}));
+        tg.sendData(JSON.stringify({ type:"history", history: history.slice(-100) }));
       });
     }
   }
 
   function addResult(n){
     history.push(n);
-    if (history.length>MAX_STORE) history=history.slice(-MAX_STORE);
+    if (history.length > MAX_STORE) history = history.slice(-MAX_STORE);
     render();
   }
 
-  function buildGrid(){
-    gridEl.innerHTML="";
-    for (let n=0;n<=36;n++){
-      const b=document.createElement("button");
-      b.className="num "+colorOf(n);
-      b.textContent=n;
-      b.onclick=()=>{
-        pendingMark=n;
-        // küçük görsel feedback:
-        document.querySelectorAll(".num").forEach(x=>x.style.outline="none");
-        b.style.outline="2px solid rgba(247,201,72,.6)";
-        b.style.boxShadow="0 0 0 6px rgba(247,201,72,.08)";
-      };
-      gridEl.appendChild(b);
-    }
-  }
-
-  // Bet slip chips
-  document.getElementById("betChips").addEventListener("click",(e)=>{
-    const chip = e.target.closest(".chip");
-    if (!chip) return;
-    const val = chip.getAttribute("data-bet");
-    if (!val) return;
-    const isOn = chip.classList.contains("on");
-    document.querySelectorAll("#betChips .chip").forEach(c=>c.classList.remove("on"));
-    if (!isOn){
-      chip.classList.add("on");
-      selectedBet = val;
-    } else {
-      selectedBet = null;
-    }
+  // Buttons
+  document.getElementById("undo").addEventListener("click", ()=>{
+    history.pop();
     render();
   });
 
-  document.getElementById("undo").onclick=()=>{
-    history.pop();
-    render();
-  };
+  document.getElementById("save").addEventListener("click", ()=>{
+    mode = "Manuel";
+    if (pendingNumber === null) return;
+    addResult(pendingNumber);
+    pendingNumber = null;
+    pickedEl.textContent = "—";
+    clearHighlights();
+  });
 
-  document.getElementById("mark").onclick=()=>{
-    mode="Manual";
-    if (pendingMark===null) return;
-    addResult(pendingMark);
-    pendingMark=null;
-    document.querySelectorAll(".num").forEach(x=>{x.style.outline="none"; x.style.boxShadow="none";});
-  };
-
-  document.getElementById("spin").onclick=()=>{
-    mode="Demo";
+  document.getElementById("demo").addEventListener("click", ()=>{
+    mode = "Demo";
     const n = Math.floor(Math.random()*37);
     addResult(n);
-  };
+  });
 
-  buildGrid();
+  // Bet buttons toggle (tek seçim)
+  document.querySelectorAll(".betBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".betBtn").forEach(b=>b.classList.remove("on"));
+      const val = btn.getAttribute("data-bet");
+      if (selectedBet === val) {
+        selectedBet = null;
+      } else {
+        btn.classList.add("on");
+        selectedBet = val;
+      }
+      render();
+    });
+  });
+
+  buildTable();
   render();
 </script>
 </body>
