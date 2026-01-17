@@ -3,33 +3,363 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Roulette Stats Mini App</title>
+  <title>Roulette • Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#0f1620; --muted:#93a4b8; --text:#e8eef7;
+      --line:rgba(255,255,255,.08); --glow:rgba(120,180,255,.25);
+      --green:#16c784; --red:#ff4d4d; --black:#1f2937; --gold:#f7c948;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(1200px 600px at 20% 0%, rgba(120,180,255,.12), transparent 55%),
+                      radial-gradient(900px 600px at 90% 30%, rgba(247,201,72,.10), transparent 60%),
+                      var(--bg);
+         color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 28px;}
+    .top{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand .t{font-weight:700;letter-spacing:.6px}
+    .brand .s{color:var(--muted);font-size:13px}
+    .pill{padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+    .grid2{display:grid;grid-template-columns: 1.35fr .65fr; gap:14px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+          border:1px solid var(--line); border-radius:18px; padding:14px;
+          box-shadow: 0 0 0 1px rgba(255,255,255,.02), 0 18px 60px rgba(0,0,0,.45);}
+    .tableHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .tableHead .h{font-weight:650}
+    .tableHead .m{color:var(--muted);font-size:12px}
+    .rouletteGrid{display:grid;grid-template-columns: repeat(6, 1fr); gap:10px}
+    .num{padding:14px 0;border-radius:14px;border:1px solid var(--line);cursor:pointer;
+         background:rgba(255,255,255,.03); color:var(--text); font-weight:650;
+         transition: transform .08s ease, border-color .2s ease, box-shadow .2s ease;}
+    .num:hover{transform: translateY(-1px); border-color: rgba(120,180,255,.25); box-shadow: 0 0 0 4px rgba(120,180,255,.08);}
+    .num.green{background:rgba(22,199,132,.12); border-color: rgba(22,199,132,.25)}
+    .num.red{background:rgba(255,77,77,.12); border-color: rgba(255,77,77,.22)}
+    .num.black{background:rgba(31,41,55,.55); border-color: rgba(255,255,255,.10)}
+    .row{display:flex;gap:10px;margin-top:12px}
+    .btn{flex:1;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
+         background:rgba(255,255,255,.03); color:var(--text); cursor:pointer; font-weight:650;}
+    .btn.primary{background:linear-gradient(180deg, rgba(120,180,255,.18), rgba(120,180,255,.06));
+                border-color: rgba(120,180,255,.28); box-shadow: 0 0 0 4px rgba(120,180,255,.08);}
+    .btn.gold{background:linear-gradient(180deg, rgba(247,201,72,.22), rgba(247,201,72,.08));
+              border-color: rgba(247,201,72,.30); box-shadow: 0 0 0 4px rgba(247,201,72,.08);}
+    .slip{display:flex;flex-direction:column;gap:12px}
+    .slip .section{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(0,0,0,.18)}
+    .sectionTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .sectionTitle .h{font-weight:650}
+    .sectionTitle .s{color:var(--muted);font-size:12px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{padding:9px 10px;border-radius:999px;border:1px solid var(--line);
+          background:rgba(255,255,255,.03); color:var(--text); cursor:pointer; font-size:13px}
+    .chip.on{border-color: rgba(120,180,255,.35); box-shadow:0 0 0 4px rgba(120,180,255,.08)}
+    .chip.red{border-color: rgba(255,77,77,.35)}
+    .chip.black{border-color: rgba(255,255,255,.18)}
+    .chip.green{border-color: rgba(22,199,132,.35)}
+    .kv{display:grid;grid-template-columns:1fr auto; gap:8px; color:var(--muted); font-size:13px}
+    .kv b{color:var(--text)}
+    .big{font-size:44px;font-weight:800;letter-spacing:1px}
+    .sub{color:var(--muted);font-size:12px;margin-top:-6px}
+    .hr{height:1px;background:var(--line);margin:10px 0}
+    .warn{color:var(--muted);font-size:12px;line-height:1.35}
+    @media (max-width: 900px){ .grid2{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
   <div class="wrap">
-    <h2>🎰 Roulette (İstatistik)</h2>
-    <div class="muted" id="hint"></div>
-
-    <div class="grid" id="grid"></div>
-
-    <div class="row">
-      <button id="undo">Geri al</button>
-      <button id="clear">Temizle</button>
+    <div class="top">
+      <div class="brand">
+        <div class="t">EURO ROULETTE</div>
+        <div class="s">Mini App • Live stats (demo)</div>
+      </div>
+      <div class="pill" id="userpill">Telegram</div>
     </div>
 
-    <div class="card">
-      <h3>Son sonuçlar</h3>
-      <div id="history" class="chips"></div>
-    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="tableHead">
+          <div>
+            <div class="h">Table</div>
+            <div class="m">Çıkan sayıyı tıkla (MARK) ya da DEMO SPIN kullan.</div>
+          </div>
+          <div style="text-align:right">
+            <div class="big" id="last">—</div>
+            <div class="sub" id="lastmeta">last result</div>
+          </div>
+        </div>
 
-    <div class="card">
-      <h3>Öneriler (istatistiksel)</h3>
-      <div id="recs" class="chips"></div>
+        <div class="rouletteGrid" id="grid"></div>
+
+        <div class="row">
+          <button class="btn" id="undo">Undo</button>
+          <button class="btn primary" id="mark">MARK RESULT</button>
+          <button class="btn gold" id="spin">DEMO SPIN</button>
+        </div>
+
+        <div class="hr"></div>
+        <div class="kv">
+          <div>History (last 20)</div><b id="hcount">0</b>
+          <div>Mode</div><b id="mode">Manual</b>
+          <div>Note</div><b>İstatistik/öneri; garanti değil</b>
+        </div>
+      </div>
+
+      <div class="card slip">
+        <div class="section">
+          <div class="sectionTitle">
+            <div class="h">Bet Slip (DEMO)</div>
+            <div class="s">parayla bağlantısız</div>
+          </div>
+
+          <div class="chips" id="betChips">
+            <div class="chip red" data-bet="RED">Red</div>
+            <div class="chip black" data-bet="BLACK">Black</div>
+            <div class="chip" data-bet="ODD">Odd</div>
+            <div class="chip" data-bet="EVEN">Even</div>
+            <div class="chip" data-bet="1-12">1st 12</div>
+            <div class="chip" data-bet="13-24">2nd 12</div>
+            <div class="chip" data-bet="25-36">3rd 12</div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="kv">
+            <div>Demo Bankroll</div><b id="bank">1000</b>
+            <div>Stake</div><b id="stake">50</b>
+            <div>Selected</div><b id="selected">—</b>
+          </div>
+          <div class="warn" style="margin-top:10px">
+            Bu slip sadece UI hissi içindir. Gerçek bahis / ödeme / yönlendirme yok.
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sectionTitle">
+            <div class="h">Insights</div>
+            <div class="s">last 50</div>
+          </div>
+          <div class="kv" id="ins"></div>
+          <div class="hr"></div>
+          <div class="sectionTitle">
+            <div class="h">Recommended (stat)</div>
+            <div class="s">top 8</div>
+          </div>
+          <div class="chips" id="recs"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) tg.expand();
+
+  const WHEEL_EU = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+
+  // Basit renk şeması (rulet masa hissi)
+  const REDS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+  function colorOf(n){
+    if (n===0) return "green";
+    return REDS.has(n) ? "red" : "black";
+  }
+
+  let history = JSON.parse(localStorage.getItem("history") || "[]");
+  const MAX_STORE = 200;
+
+  let pendingMark = null; // MARK RESULT için seçilen sayı
+  let mode = "Manual";
+  let bankroll = 1000;
+  let stake = 50;
+  let selectedBet = null;
+
+  const gridEl = document.getElementById("grid");
+  const lastEl = document.getElementById("last");
+  const lastMeta = document.getElementById("lastmeta");
+  const recsEl = document.getElementById("recs");
+  const insEl = document.getElementById("ins");
+  const hcountEl = document.getElementById("hcount");
+  const modeEl = document.getElementById("mode");
+  const bankEl = document.getElementById("bank");
+  const stakeEl = document.getElementById("stake");
+  const selectedEl = document.getElementById("selected");
+  const userpill = document.getElementById("userpill");
+
+  if (tg?.initDataUnsafe?.user) {
+    userpill.textContent = tg.initDataUnsafe.user.username ? "@"+tg.initDataUnsafe.user.username : (tg.initDataUnsafe.user.first_name || "Telegram");
+  }
+
+  function save(){ localStorage.setItem("history", JSON.stringify(history.slice(-MAX_STORE))); }
+
+  function freqMap(history, windowSize=50){
+    const slice = history.slice(-windowSize);
+    const m = new Map(); for (let i=0;i<=36;i++) m.set(i,0);
+    for (const n of slice) m.set(n,(m.get(n)||0)+1);
+    return m;
+  }
+  function recencyMap(history){
+    const m=new Map(); for (let i=0;i<=36;i++) m.set(i,Infinity);
+    for (let idx=history.length-1; idx>=0; idx--){
+      const n=history[idx];
+      if (m.get(n)===Infinity) m.set(n, history.length-1-idx);
+    }
+    return m;
+  }
+  function wheelNeighbors(n,k=2){
+    const i=WHEEL_EU.indexOf(n); if (i<0) return [];
+    const res=[];
+    for (let d=1; d<=k; d++){
+      res.push(WHEEL_EU[(i+d)%WHEEL_EU.length]);
+      res.push(WHEEL_EU[(i-d+WHEEL_EU.length)%WHEEL_EU.length]);
+    }
+    return [...new Set(res)];
+  }
+  function recommendNumbers(history,{windowSize=50,topK=8,wCold=1.0,wRecency=1.2,wNeighbors=0.8}={}){
+    if (!history.length) return [];
+    const freq=freqMap(history,windowSize);
+    const rec=recencyMap(history);
+    const last=history[history.length-1];
+    const neigh=new Set(wheelNeighbors(last,2));
+
+    let maxF=0; for (const v of freq.values()) maxF=Math.max(maxF,v);
+    let maxR=0; for (const v of rec.values()){
+      const vv=(v===Infinity)?history.length:v; maxR=Math.max(maxR,vv);
+    }
+
+    const scored=[];
+    for (let n=0;n<=36;n++){
+      const f=freq.get(n)||0;
+      const rRaw=rec.get(n);
+      const r=(rRaw===Infinity)?history.length:rRaw;
+
+      const cold=(maxF===0)?0:(maxF-f)/maxF;
+      const recency=(maxR===0)?0:r/maxR;
+      const neighbor=neigh.has(n)?1:0;
+
+      const score=wCold*cold+wRecency*recency+wNeighbors*neighbor;
+      scored.push({n,score,f,r,neighbor});
+    }
+    scored.sort((a,b)=>b.score-a.score);
+    return scored.slice(0,topK);
+  }
+
+  function insights(history){
+    const win=history.slice(-50);
+    if (!win.length) return {hot:[], cold:[], longest:[]};
+    const fm=freqMap(history,50);
+    const rm=recencyMap(history);
+
+    const arr=[...fm.entries()].map(([n,f])=>({n,f})).sort((a,b)=>b.f-a.f);
+    const hot=arr.slice(0,5);
+    const cold=arr.slice(-5).reverse();
+
+    const recArr=[...rm.entries()].map(([n,r])=>({n, r:(r===Infinity)?history.length:r})).sort((a,b)=>b.r-a.r);
+    const longest=recArr.slice(0,5);
+
+    return {hot,cold,longest};
+  }
+
+  function render(){
+    const last = history.length ? history[history.length-1] : null;
+    lastEl.textContent = (last===null) ? "—" : String(last);
+    lastMeta.textContent = (last===null) ? "last result" : `last: ${colorOf(last)} • history: ${history.length}`;
+    hcountEl.textContent = String(Math.min(20, history.length));
+    modeEl.textContent = mode;
+
+    bankEl.textContent = bankroll;
+    stakeEl.textContent = stake;
+    selectedEl.textContent = selectedBet || "—";
+
+    // insights
+    const ins = insights(history);
+    insEl.innerHTML = `
+      <div>Hot</div><b>${ins.hot.map(x=>x.n).join(", ") || "—"}</b>
+      <div>Cold</div><b>${ins.cold.map(x=>x.n).join(", ") || "—"}</b>
+      <div>Longest missing</div><b>${ins.longest.map(x=>x.n).join(", ") || "—"}</b>
+    `;
+
+    // recs
+    recsEl.innerHTML = "";
+    const recs = recommendNumbers(history,{topK:8});
+    for (const x of recs){
+      const d=document.createElement("div");
+      d.className="chip "+(colorOf(x.n));
+      d.textContent = `${x.n}`;
+      d.title = `f:${x.f} r:${x.r}${x.neighbor?", neighbor":""}`;
+      recsEl.appendChild(d);
+    }
+
+    save();
+
+    // Telegram MainButton: history yolla (opsiyonel)
+    if (tg){
+      tg.MainButton.setText("Send history to bot");
+      tg.MainButton.show();
+      tg.MainButton.onClick(()=>{
+        tg.sendData(JSON.stringify({type:"history", history: history.slice(-100)}));
+      });
+    }
+  }
+
+  function addResult(n){
+    history.push(n);
+    if (history.length>MAX_STORE) history=history.slice(-MAX_STORE);
+    render();
+  }
+
+  function buildGrid(){
+    gridEl.innerHTML="";
+    for (let n=0;n<=36;n++){
+      const b=document.createElement("button");
+      b.className="num "+colorOf(n);
+      b.textContent=n;
+      b.onclick=()=>{
+        pendingMark=n;
+        // küçük görsel feedback:
+        document.querySelectorAll(".num").forEach(x=>x.style.outline="none");
+        b.style.outline="2px solid rgba(247,201,72,.6)";
+        b.style.boxShadow="0 0 0 6px rgba(247,201,72,.08)";
+      };
+      gridEl.appendChild(b);
+    }
+  }
+
+  // Bet slip chips
+  document.getElementById("betChips").addEventListener("click",(e)=>{
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const val = chip.getAttribute("data-bet");
+    if (!val) return;
+    const isOn = chip.classList.contains("on");
+    document.querySelectorAll("#betChips .chip").forEach(c=>c.classList.remove("on"));
+    if (!isOn){
+      chip.classList.add("on");
+      selectedBet = val;
+    } else {
+      selectedBet = null;
+    }
+    render();
+  });
+
+  document.getElementById("undo").onclick=()=>{
+    history.pop();
+    render();
+  };
+
+  document.getElementById("mark").onclick=()=>{
+    mode="Manual";
+    if (pendingMark===null) return;
+    addResult(pendingMark);
+    pendingMark=null;
+    document.querySelectorAll(".num").forEach(x=>{x.style.outline="none"; x.style.boxShadow="none";});
+  };
+
+  document.getElementById("spin").onclick=()=>{
+    mode="Demo";
+    const n = Math.floor(Math.random()*37);
+    addResult(n);
+  };
+
+  buildGrid();
+  render();
+</script>
 </body>
 </html>
