@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Roulette Stats Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h2>🎰 Roulette (İstatistik)</h2>
+    <div class="muted" id="hint"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="row">
+      <button id="undo">Geri al</button>
+      <button id="clear">Temizle</button>
+    </div>
+
+    <div class="card">
+      <h3>Son sonuçlar</h3>
+      <div id="history" class="chips"></div>
+    </div>
+
+    <div class="card">
+      <h3>Öneriler (istatistiksel)</h3>
+      <div id="recs" class="chips"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
